@@ -109,42 +109,110 @@ El sistema se organiza en tres capas:
 data Ubicacion = Cocina | Living | Garage | Pieza | Exterior
   deriving (Show, Eq, Ord)
 
-data DiaSemana = Lunes | Martes | Miercoles | Jueves
-               | Viernes | Sabado | Domingo
+data DiaSemana = Lunes 
+                | Martes 
+                | Miercoles 
+                | Jueves
+                | Viernes 
+                | Sabado 
+                | Domingo
   deriving (Show, Eq, Ord, Enum)
 
-data Objeto = LuzLiving | LuzPieza | LuzGarage
-            | Heladera  | Persiana  | PortonGarage
+data TipoEncendible = Luz 
+                    | Heladera 
+                    | AireAcond 
+                    | Lavarropa 
+                    | Microondas 
+                    | Calefactor
   deriving (Show, Eq, Ord)
 
-data EstadoDispositivo = Encendido | Apagado | Abierto | Cerrado | Activado
+data TipoAbrible = Persiana 
+                  | Porton 
+                  | Puerta
+  deriving (Show, Eq, Ord)
+
+data TipoActivable = Boton | SensorMovimiento
   deriving (Show, Eq)
+
+data ObjetoEncendible = ObjetoEncendible {
+  tipoEnc :: TipoEncendible,
+  ubicacionEnc :: Ubicacion,
+  estadoEnc :: EstadoEncendible,
+  nombreEnc :: String
+}
+  deriving (Show, Eq, Ord)
+
+data ObjetoAbrible = ObjetoAbrible {
+  tipoAbr :: TipoAbrible,
+  ubicacionAbr :: Ubicacion,
+  estadoAbr :: EstadoAbrible,
+  nombreAbr :: String
+}
+  deriving (Show, Eq, Ord)
+
+data ObjetoActivable = ObjetoActivable {
+  tipoAct :: TipoActivable,
+  ubicacionAct :: Ubicacion,
+  estadoAct :: EstadoActivable,
+  nombreAct :: String
+}
+  deriving (Show, Eq, Ord)
+
+data Objeto = OEncendible ObjetoEncendible 
+            | OAbrible ObjetoAbrible 
+            | OActivable ObjetoActivable
+  deriving (Show, Eq, Ord)
+
+--Estado para encendibles y estado abribles
+data EstadoEncendible = Encendido | Apagado
+  deriving (Show, Eq)
+
+data EstadoAbrible = Abierto | Cerrado
+  deriving (Show, Eq)
+
+data EstadoActivable = Activado | Desactivado
+  deriving (Show, Eq)
+
+data EstadoDispositivo = EEncendible EstadoEncendible
+                        | EAbrible EstadoAbrible
+                        | EActivable EstadoActivable
+  deriving (Show, Eq)
+
+
+data Sensor = Temperatura Ubicacion 
+            | Luminosidad Ubicacion 
+            | Humedad Ubicacion
+  deriving (Show, Eq)
+
+data Comparador = Mayor | Menor | Igual
+  deriving (Show, Eq)
+
+
 ```
 
 ### Condiciones y acciones ejemplos
 
 ```haskell
 data Condicion
-  = TemperaturaMenorQue Ubicacion Int
-  | TemperaturaMayorQue Ubicacion Int
-  | PresenciaEn         Ubicacion
-  | NoHayPresenciaEn    Ubicacion
-  | EstadoEs            Objeto EstadoDispositivo
-  | EsDia               DiaSemana
-  | EsHora              Int              -- 0 .. 23
-
+  = CondSensor Sensor Comparador Int
+  | CondEstadoEnc ObjetoEncendible EstadoEncendible
+  | CondEstadoAbr ObjetoAbrible EstadoAbrible
+  | CondEstadoAct ObjetoActivable EstadoActivable
+  | CondDia DiaSemana
+  | CondHora Comparador Int             -- 0 .. 23
   -- Condiciones compuestas (tipos recursivos) ?? reveer
   | Y  Condicion Condicion
   | O  Condicion Condicion
   | No Condicion
+  deriving (Show, Eq, Ord)
 
 data Accion
-  = Encender    Objeto
-  | Apagar      Objeto
-  | Abrir       Objeto
-  | Cerrar      Objeto
-  | EncenderPor Objeto Int              -- con duración en segundos
-
+  = Encender    ObjetoEncendible
+  | Apagar      ObjetoEncendible
+  | Abrir       ObjetoAbrible
+  | Cerrar      ObjetoAbrible
+  | EncenderTemporizado ObjetoEncendible Int           -- con duración en segundos
+  deriving (Show, Eq, Ord)
 ```
 ---
 
