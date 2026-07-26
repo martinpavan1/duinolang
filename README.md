@@ -137,7 +137,6 @@ data TipoActivable = Boton | SensorMovimiento
 data ObjetoEncendible = ObjetoEncendible {
   tipoEnc :: TipoEncendible,
   ubicacionEnc :: Ubicacion,
-  estadoEnc :: EstadoEncendible,
   nombreEnc :: String
 }
   deriving (Show, Eq, Ord)
@@ -145,7 +144,6 @@ data ObjetoEncendible = ObjetoEncendible {
 data ObjetoAbrible = ObjetoAbrible {
   tipoAbr :: TipoAbrible,
   ubicacionAbr :: Ubicacion,
-  estadoAbr :: EstadoAbrible,
   nombreAbr :: String
 }
   deriving (Show, Eq, Ord)
@@ -153,7 +151,6 @@ data ObjetoAbrible = ObjetoAbrible {
 data ObjetoActivable = ObjetoActivable {
   tipoAct :: TipoActivable,
   ubicacionAct :: Ubicacion,
-  estadoAct :: EstadoActivable,
   nombreAct :: String
 }
   deriving (Show, Eq, Ord)
