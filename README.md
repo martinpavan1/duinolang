@@ -118,6 +118,7 @@ data DiaSemana = Lunes
                 | Domingo
   deriving (Show, Eq, Ord, Enum)
 
+-- Tipo para objetos electricos que pueden encenderse-apagarse
 data TipoEncendible = Luz 
                     | Heladera 
                     | AireAcond 
@@ -126,14 +127,18 @@ data TipoEncendible = Luz
                     | Calefactor
   deriving (Show, Eq, Ord)
 
+-- Tipo para objetos que se abren-cierran
 data TipoAbrible = Persiana 
                   | Porton 
                   | Puerta
   deriving (Show, Eq, Ord)
 
+-- Tipo para objetos que se activan-desactivan
 data TipoActivable = Boton | SensorMovimiento
-  deriving (Show, Eq)
+  deriving (Show, Eq, Ord)
 
+
+-- Objetos encendibles, activables y abribles
 data ObjetoEncendible = ObjetoEncendible {
   tipoEnc :: TipoEncendible,
   ubicacionEnc :: Ubicacion,
@@ -155,12 +160,13 @@ data ObjetoActivable = ObjetoActivable {
 }
   deriving (Show, Eq, Ord)
 
+-- Objeto general
 data Objeto = OEncendible ObjetoEncendible 
             | OAbrible ObjetoAbrible 
             | OActivable ObjetoActivable
   deriving (Show, Eq, Ord)
 
---Estado para encendibles y estado abribles
+--Estados para encendibles, abribles y activables
 data EstadoEncendible = Encendido | Apagado
   deriving (Show, Eq)
 
@@ -175,7 +181,7 @@ data EstadoDispositivo = EEncendible EstadoEncendible
                         | EActivable EstadoActivable
   deriving (Show, Eq)
 
-
+-- Tipo de sensores definidos
 data Sensor = Temperatura Ubicacion 
             | Luminosidad Ubicacion 
             | Humedad Ubicacion
@@ -214,20 +220,33 @@ data Accion
 ---
 
 ##  State Monad
-Evaluar usar State Monad para representar los estados del ambiente, tales como temperaturas, luces, presencias, etce etc
+Utilizariamos el State Monad para el manejo del Estado global, definiendo el Estado como:
+```haskell
+data Estado = Estado 
+  { hrActual  :: Int,
+    diaActual :: DiaSemana,
+    temperaturas  :: [(Ubicacion, Int)],
+    luminosidades :: [(Ubicacion, Int)], 
+    humedades ::  [(Ubicacion, Int)],
+    estadosEncendibles  :: [(ObjetoEncendible, EstadoEncendible)],
+    estadosAbribles :: [(ObjetoAbrible, EstadoAbrible)],
+    estadosActivable :: [(ObjetoActivable, EstadoActivable)],
+    }
+    deriving Show
 
+```
+Consultar si utilizamos par clave,valor o MAP
+Ver funciones ACTUALIZAR, OBTENER, MODIFICAR, ELIMINAR, del estado. (CRUD)
 
 
 ---
-
-
 
 
 ##  Alcance del Proyecto
 
 ###  Incluye
 
-- Tipos (`Objeto`, `Sensor`, `Ubicacion`, `DiaSemana`)
+- Tipos (`Objeto`, `Sensor`, `Ubicacion`, `DiaSemana`, `EstadoDispositivo`)
 - AST de `Condicion` y `Accion` con tipos recursivos (REVEER RECURSIVOS)
 - Evaluador: dadas reglas y estado, retorna acciones 
 - Simulador interactivo: botón que avanza hora/día y reevalua el programa
