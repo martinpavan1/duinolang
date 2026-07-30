@@ -160,31 +160,20 @@ data ObjetoActivable = ObjetoActivable {
 }
   deriving (Show, Eq, Ord)
 
--- Objeto general
-data Objeto = OEncendible ObjetoEncendible 
-            | OAbrible ObjetoAbrible 
-            | OActivable ObjetoActivable
-  deriving (Show, Eq, Ord)
-
 --Estados para encendibles, abribles y activables
 data EstadoEncendible = Encendido | Apagado
-  deriving (Show, Eq)
+  deriving (Show, Eq, Ord)
 
 data EstadoAbrible = Abierto | Cerrado
-  deriving (Show, Eq)
+  deriving (Show, Eq, Ord)
 
 data EstadoActivable = Activado | Desactivado
-  deriving (Show, Eq)
-
-data EstadoDispositivo = EEncendible EstadoEncendible
-                        | EAbrible EstadoAbrible
-                        | EActivable EstadoActivable
-  deriving (Show, Eq)
+  deriving (Show, Eq, Ord)
 
 -- Tipo de sensores definidos
-data Sensor = Temperatura Ubicacion 
-            | Luminosidad Ubicacion 
-            | Humedad Ubicacion
+data Sensor = Temperatura Ubicacion String
+            | Luminosidad Ubicacion String
+            | Humedad Ubicacion String
   deriving (Show, Eq)
 
 data Comparador = Mayor | Menor | Igual
@@ -238,6 +227,15 @@ data Estado = Estado
 Consultar si utilizamos par clave,valor o MAP
 Ver funciones ACTUALIZAR, OBTENER, MODIFICAR, ELIMINAR, del estado. (CRUD)
 
+## Gramática 
+
+Sensor ::= TipoSensor Ubicacion
+TipoSensor ::= "temperatura" | "luminosidad" | "humedad"
+Ubicacion ::= Nombre
+                      PREGUNTAR SOBRE SENSORES!!!!!!!!!!!!!!!!!!
+                      TIPO SENSORES? ANALOGICO DIGITAL
+                      LISTA DE SENSORES O OBJETOS DISPONIBLES(PREDEFINIDOS)  O EL USUARIO PUEDE CREAR MAS SENSORES?
+                      DEFINICION DE PINES EN ARDUINO(COMO SE LIGA LA DECLARACION DEL SENSOR EN EL PROGRAMA A LA DE ARDUINO)
 
 ---
 
@@ -246,12 +244,26 @@ Ver funciones ACTUALIZAR, OBTENER, MODIFICAR, ELIMINAR, del estado. (CRUD)
 
 ###  Incluye
 
-- Tipos (`Objeto`, `Sensor`, `Ubicacion`, `DiaSemana`, `EstadoDispositivo`)
-- AST de `Condicion` y `Accion` con tipos recursivos (REVEER RECURSIVOS)
-- Evaluador: dadas reglas y estado, retorna acciones 
-- Simulador interactivo: botón que avanza hora/día y reevalua el programa
-- `Maybe` para manejo de errrores
-- Parser
+**Tipos del dominio**
+- `Ubicacion`, `DiaSemana`
+- `TipoEncendible`, `TipoAbrible`, `TipoActivable` - variedades de tipo de dispositivos
+- `ObjetoEncendible`, `ObjetoAbrible`, `ObjetoActivable` - objetos separados por familia 
+- `EstadoEncendible`, `EstadoAbrible`, `EstadoActivable` - estados separados por familia 
+
+**AST del lenguaje**
+- `Condicion` y `Accion`, con tipado por familia(no permite "cerrar" una luz)
+
+**Estado del sistema**
+- Tipo `Estado`con el estado de cada objeto/sensor, representado como listas de pares `[(clave, valor)]` ((VER SI USAR MAP))
+- Monada `State` de Haskell, para manipular estado global
+- Operaciones sobre el estado: **obtener** (`lookup`) y **actualizar** (inserta o reemplaza sin duplicar clave).
+
+**Parser**
+- Gramática formal que define sin ambigüedad la sintaxis de reglas, incluyendo precedencia de operadores lógicos (`no` > `y` > `o`)
+- Traducción de texto plano a `Regla` (`Condicion` + `Accion`), devolviendo `Maybe`/`Either` ante reglas mal formadas o que referencian objetos no configurados
+
+**Manejo de errores**
+- `Maybe`/`Either` en las etapas donde puede fallar: parseo de reglas mal escritas, resolución de nombres de objeto contra la tabla de configuración, lectura de sensores no registrados en el `Estado`
 
 ###  No Incluye
 
