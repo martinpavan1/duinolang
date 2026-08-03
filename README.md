@@ -203,7 +203,7 @@ data Accion
   | Apagar      ObjetoEncendible
   | Abrir       ObjetoAbrible
   | Cerrar      ObjetoAbrible
-  | EncenderTemporizado ObjetoEncendible Int           -- con duración en segundos
+  | EncenderTemporizado ObjetoEncendible Int    -- con duración en segundos
   deriving (Show, Eq, Ord)
 ```
 ---
@@ -230,12 +230,14 @@ Ver funciones ACTUALIZAR, OBTENER, MODIFICAR, ELIMINAR, del estado. (CRUD)
 ## Gramática 
 
 Sensor ::= TipoSensor Ubicacion
+
 TipoSensor ::= "temperatura" | "luminosidad" | "humedad"
+
 Ubicacion ::= Nombre
-                      PREGUNTAR SOBRE SENSORES!!!!!!!!!!!!!!!!!!
-                      TIPO SENSORES? ANALOGICO DIGITAL
-                      LISTA DE SENSORES O OBJETOS DISPONIBLES(PREDEFINIDOS)  O EL USUARIO PUEDE CREAR MAS SENSORES?
-                      DEFINICION DE PINES EN ARDUINO(COMO SE LIGA LA DECLARACION DEL SENSOR EN EL PROGRAMA A LA DE ARDUINO)
+
+- PREGUNTAR SOBRE SENSORES!!!!!!!!!!!!!!!!!! TIPO SENSORES? ANALOGICO DIGITAL
+- LISTA DE SENSORES O OBJETOS DISPONIBLES(PREDEFINIDOS)  O EL USUARIO PUEDE CREAR MAS SENSORES?
+- DEFINICION DE PINES EN ARDUINO(COMO SE LIGA LA DECLARACION DEL SENSOR EN EL PROGRAMA A LA DE ARDUINO)
 
 ---
 
