@@ -1,0 +1,81 @@
+
+Parser:
+si temperatura Cocina > 24 then encender AireAcon
+
+if (condicion) then (accion)
+
+(condicion) => 'temperatura' 'Cocina' > 24
+
+'temperatura' 'Cocina' -> construir AST Sensor Temperatura Cocina
+
+AST:
+construir AST Sensor Temperatura Cocina
+
+En el evaluador:
+Todo lo que sea tipo Sensor, lo almacena en el Estado
+como tambien todas las variables que se definan
+
+
+
+Hace muchas cosas....
+
+funcion generar codigo:
+- leer del Estado (monada state) las variables, sensores, etc
+
+Sensor Temperatura Cocina -> const int sensorTempCocina = A0;
+
+
+
+const int sensorTemp = A0;
+const int sensorX = A1;
+const int led = 13;
+
+void setup() {
+  pinMode(led, OUTPUT);
+  Serial.begin(9600);
+}
+
+void loop() {
+  // Leer el valor analógico (0-1023)
+  int lectura = analogRead(sensorTemp);
+
+  // Convertir a voltaje
+  float voltaje = lectura * (5.0 / 1023.0);
+
+  // LM35: 10 mV por cada °C
+  float temperatura = voltaje * 100.0;
+
+  // Mostrar la temperatura
+  Serial.print("Temperatura: ");
+  Serial.print(temperatura);
+  Serial.println(" °C");
+
+  // Si supera los 30 °C, encender el LED
+  if (temperatura > 30.0) {
+    digitalWrite(led, HIGH);
+  } else {
+    digitalWrite(led, LOW);
+  }
+
+  delay(1000);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+si presencia Living == falso then apagar LuzLiving
+si botonGarage activado then abrir portonGarage
+si portonGarage abierto then encender luzGarage 60s
+si martes then encender LuzLiving
+si 8 then abrir persiana
+si 18 then cerrar persiana

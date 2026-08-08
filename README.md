@@ -45,6 +45,28 @@ El objetivo central es que el usuario final pueda **describir comportamientos** 
 El usuario escribe reglas en un formato declarativo. Cada regla sigue la estructura:
 
 ```
+//Declaracion de pines disponibles en placa
+//Total de pines digitales disponibles = 13 (depende de placa fisica)
+//Total de pines analogicos disponibles = 5 (depende de placa fisica)
+[Pin0-input, Pin1-input, Pin2-input, Pin6-output]
+
+//Declaración de sensores
+//Sintaxis: Sensor 'nombre' 'tipo de señal' 'pin de conexión (input)'
+define
+Sensor tempCocina Digital 0
+Sensor presenciaLiving Digital 1
+Sensor botonGarage Digital 5
+...
+end-define
+
+//Declaración de objetos (salida de la placa)
+//Sintaxis: Objeto 'nombre' 'tipo de objeto' 'ubicacion' 'estado' 'pin de conexión (output)'
+
+objetos
+Objeto AAPieza TipoEncendible Pieza 0 6
+Objeto LuzGarage TipoEncendible Garage 0 2
+fin-objetos
+
 si <condición> then <acción>
 ```
 
