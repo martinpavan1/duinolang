@@ -3,7 +3,7 @@ data Ubicacion = Cocina
                 | Garage 
                 | Pieza 
                 | Exterior
-  deriving (Show, Eq, Ord)
+  deriving (Show, Eq, Ord, Enum)
 
 data DiaSemana = Lunes 
                 | Martes 
@@ -13,6 +13,13 @@ data DiaSemana = Lunes
                 | Sabado 
                 | Domingo
   deriving (Show, Eq, Ord, Enum)
+
+data Hora = Hora {
+  horas :: Int,
+  minutos :: Int,
+  segundos :: Int
+  
+} deriving (Show, Eq, Ord)
 
 data TipoObjeto = TipoEncendible 
                 | TipoAbrible 
@@ -31,48 +38,19 @@ data Objeto = Objeto {
 --Estados para encendibles, abribles y activables
 -- Preguntar si con el nivel solucionamos los estados intermedios y completos
 data EstadoObjeto = EstadoObjeto {
-        nivel :: Int --de 0 a 100.. 
-                      --0 es apagado, 100 es encendido, 1 a 99 estados intermedios, podemos definir estados intermedios fijos(ej: 25, 50, 75)
+        nivel :: Int -- de 0 a 100.. 
+                      -- 0 es apagado, 100 es encendido
+                      -- 1 a 99 estados intermedios 
+                      -- podemos definir estados intermedios fijos(ej: 25, 50, 75)
 } deriving (Show, Eq, Ord)
 
-
--- Tipo de sensores definidos
--- data Sensor = Temperatura Ubicacion String
---             | Luminosidad Ubicacion String
---             | Humedad Ubicacion String
---   deriving (Show, Eq)
 
 data TipoSenial = Digital | Analogica
   deriving (Show, Eq)
 
 type Pin = Int
 type Nombre = String
-{-
-## Definir pool de pines disponibles
 
-* pines fisicos de la placa, ya sean digitales o analogicos
-(10 digitales, 5 analogicos)
-
-* Comportamiento de los pines (input/output)
-
-* Señal admitida por cada pin 
-
-* Implementar validaciones para detectar si el pin definido esta usado/input/output/señal permitida (digital/analogica)
-
-(0-5 digital input)
-(6-9 digital output)
-(A0-A5) analogico
-
-
-## Cuando el usuario defina los pines
-Sensor TempCocina Digital 0
-Sensor BotonGarage Digital 1
-
-Se creara en el estado los sensores:
-[Sensor TempCocina Digital 0, Sensor BotonGarage Digital 1]
-
-Para luego acceder a los sensores definidos para utilizarlos en el resto del programa 
--}
 
 data Sensor = Sensor {
     nombreSensor :: Nombre,
@@ -80,33 +58,6 @@ data Sensor = Sensor {
     pinInput :: Pin
   } deriving (Show, Eq)
 
-type ConfigSensores = [(Nombre, (Pin, TipoSenial))]
--- Al usuario le tiene que permitir definir el nombre 
--- del sensor y automaticamente adosarce al pin y tipo de señal correspondiente a ese sensor
-
---Y si forzamos que al principio de la ejecución del programa, el usuario defina los sensores que va a usar
-{-
-Parte del Parser:
-define Sensores = [
-  Cocina:Temperatura:2, 
-  Living:Luminosidad:3, 
-  Garage:Humedad:0
-  ]
-
-define
-Sensor TempCocina Digital 0,
-Sensor BotonGarage Digital 1,
-end-define
-
-Se construye el AST:
-Sensor Temperatura
-
-
-y el programa se encargue de asociarlos a los pines y tipos de señal correspondientes, para que luego el usuario pueda referirse a ellos por nombre.
--}
-
--- Como definimos que es un sensor digital o analogico?
--- El usuario sabe diferenciar entre sensor analogico y digital.. 
 
 data Comparador = Mayor | Menor | Igual
   deriving (Show, Eq, Ord) -- Ver si lo sacamos??
@@ -123,18 +74,33 @@ data Accion = Encender    Objeto
             | Apagar      Objeto
             | Abrir       Objeto
             | Cerrar      Objeto
-            | EncenderTemporizado Objeto Int    -- con duración en segundos
+            | EncenderTemporizado Objeto Hora    -- duracion expresada en hr, min y seg | ejemplo 3:12:54 (3 x 3.600 + 12 x 60 + 54) x 1000 --> millis totales p arduino
             deriving (Show, Eq, Ord)
 
 
-
+-- Estado guarda todos las configuraciones de los pines, sensores y objetos, y sus estados actuales definidos por el usuario en define
 data Estado = Estado { 
-  hrActual  :: Int,
-  diaActual :: DiaSemana,
-  sensores :: [Sensor], -- ver
-  -- temperaturas  :: [(Ubicacion, Int)],
-  -- luminosidades :: [(Ubicacion, Int)], 
-  -- humedades ::  [(Ubicacion, Int)],
-  estados :: [(Objeto, EstadoObjeto)]
+  --hrActual  :: Int, -- ver
+  --diaActual :: DiaSemana, -- ver
+  estadoObjeto :: [(Objeto, EstadoObjeto)]
+  sensores :: [Sensor],
+  pines :: [(Pin, Bool)], -- Pin usado(T) o no usado(F) 
+  temporizadores :: [(Objeto, Hora)] -- pool de temporizadores
   }
     deriving Show
+
+
+{-
+
+  if(sensorpresencia activo && luz apagada){
+    encendertemporizado luz 60
+    luzapagada = false
+
+    } else if(sensorpresencia inactivo && luz encendida){
+    encendertemporizado luz 10
+    }
+
+    if(sensor activo)
+      encendertemporaizado 10
+
+-}

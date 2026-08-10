@@ -44,31 +44,69 @@ El objetivo central es que el usuario final pueda **describir comportamientos** 
 
 El usuario escribe reglas en un formato declarativo. Cada regla sigue la estructura:
 
+### Declaración de pines
+ 
+Los pines físicos de la placa (digitales o analógicos) se declaran indicando su comportamiento (`input`/`output`). 
+El sistema valida que cada pin utilizado esté declarado, no esté duplicado y admita la señal correspondiente.
+ 
 ```
-//Declaracion de pines disponibles en placa
-//Total de pines digitales disponibles = 13 (depende de placa fisica)
-//Total de pines analogicos disponibles = 5 (depende de placa fisica)
 [Pin0-input, Pin1-input, Pin2-input, Pin6-output]
-
-//Declaración de sensores
-//Sintaxis: Sensor 'nombre' 'tipo de señal' 'pin de conexión (input)'
+```
+ 
+> Total de pines digitales disponibles: 10 · Total de pines analógicos disponibles: 5 *(depende de la placa física)*
+ 
+### Declaración de sensores
+ 
+**Sintaxis:** `Sensor 'nombre' 'tipo de señal' 'pin de conexión (input)'`
+ 
+```
 define
 Sensor tempCocina Digital 0
 Sensor presenciaLiving Digital 1
 Sensor botonGarage Digital 5
-...
 end-define
+```
+ 
+Esto agrega al estado los sensores declarados:
+ 
+```haskell
+[Sensor TempCocina Digital 0, Sensor BotonGarage Digital 1]
+```
+ 
+quedando disponibles para ser referenciados en el resto del programa.
 
-//Declaración de objetos (salida de la placa)
-//Sintaxis: Objeto 'nombre' 'tipo de objeto' 'ubicacion' 'estado' 'pin de conexión (output)'
-
+### Declaración de objetos
+ 
+**Sintaxis:** `Objeto 'nombre' 'tipo de objeto' 'ubicación' 'estado' 'pin de conexión (output)'`
+ 
+```
 objetos
 Objeto AAPieza TipoEncendible Pieza 0 6
 Objeto LuzGarage TipoEncendible Garage 0 2
 fin-objetos
-
-si <condición> then <acción>
 ```
+ 
+Esto agrega al estado los objetos declarados:
+ 
+```haskell
+[Objeto AAPieza TipoEncendible Pieza 0 6, Objeto LuzGarage TipoEncendible Garage 0 2]
+```
+
+### Declaracion de temporizadores
+si portonGarage abierto then encender **(luzGarage 00:01:00)** 
+
+desde esta sentencia (luzGarage 00:01:00) construimos el temporizador en el estado (Objeto, Hora) --> (luzGarage, 00:01:00)
+
+deriva en
+```arduino
+const unsigned long TIMER_LUZGARAGE = 60000 //(60 x 1000 para millis)
+```
+
+# ARREGLAR DE ACA PARA ABAJO
+
+quedando disponibles para ser referenciados en el resto del programa.
+si <condición> then <acción>
+
 
 ### Ejemplos de Reglas
 
@@ -76,7 +114,7 @@ si <condición> then <acción>
 si temperatura Cocina > 24 then encender AireAcon
 si presencia Living == falso then apagar LuzLiving
 si botonGarage activado then abrir portonGarage
-si portonGarage abierto then encender luzGarage 60s
+si portonGarage abierto then encender (luzGarage 00:01:00) desde esta sentencia construimos el temporizador en el estado (Objeto, Hora) --> (luzGarage, 00:01:00)
 si martes then encender LuzLiving
 si 8 then abrir persiana
 si 18 then cerrar persiana
