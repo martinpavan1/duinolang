@@ -93,7 +93,7 @@ Esto agrega al estado los objetos declarados:
 ```
 
 ### Declaracion de temporizadores
-si portonGarage abierto then encender **(luzGarage 00:01:00)** 
+si portonGarage abierto entonces encender **(luzGarage 00:01:00)** 
 
 desde esta sentencia (luzGarage 00:01:00) construimos el temporizador en el estado (Objeto, Hora) --> (luzGarage, 00:01:00)
 
@@ -104,20 +104,31 @@ const unsigned long TIMER_LUZGARAGE = 60000 //(60 x 1000 para millis)
 
 # ARREGLAR DE ACA PARA ABAJO
 
-quedando disponibles para ser referenciados en el resto del programa.
-si <condición> then <acción>
-
 
 ### Ejemplos de Reglas
 
 ```
-si temperatura Cocina > 24 then encender AireAcon
-si presencia Living == falso then apagar LuzLiving
-si botonGarage activado then abrir portonGarage
-si portonGarage abierto then encender (luzGarage 00:01:00) desde esta sentencia construimos el temporizador en el estado (Objeto, Hora) --> (luzGarage, 00:01:00)
-si martes then encender LuzLiving
-si 8 then abrir persiana
-si 18 then cerrar persiana
+//Sensor 'nombre' 'tipo de señal' 'pin de conexión (input)'
+//Objeto 'nombre' 'tipo de objeto' 'ubicación' 'estado' 'pin de conexión (output)'
+define
+Sensor tempCocina Digital 0
+Sensor presenciaLiving Digital 1
+Sensor botonGarage Digital 5
+
+Objeto AireAcon TipoEncendible Cocina 0 6
+Objeto LuzLiving TipoEncendible Living 0 7
+Objeto PortonGarage TipoAbrible Garage 0 8
+Objeto LuzGarage TipoEncendible Garage 0 2
+Objeto Persiana TipoAbrible Living 0 9
+end-define
+ 
+si tempCocina > 24 entonces encender AireAcon
+si presenciaLiving == inactivo entonces apagar LuzLiving
+si botonGarage activado entonces abrir PortonGarage
+si PortonGarage abierto entonces encender (LuzGarage 00:01:00)
+si martes entonces encender LuzLiving
+si hora >= 08:00:00 entonces abrir Persiana
+si hora >= 18:00:00 entonces cerrar Persiana
 ```
 
 ### Texto → AST
@@ -126,11 +137,8 @@ Cada regla en texto plano se transforma en su representación interna en Haskell
 
 | DSL (texto) | AST (Haskell) |
 |-------------|---------------|
-| `si temperatura Cocina > 24 then encender AireAcon` | `Si (TempMayor Cocina 24) (Encender AireCon)` |
-| `si presencia Living == falso then apagar LuzLiving` | `Si (NoHayPresencia Living) (Apagar LuzLiving)` |
-| `si botonGarage activado then abrir portonGarage` | `Si (EstadoEs BotonGarage Activado) (Abrir Porton)` |
-| `si martes then encender LuzLiving` | `Si (EsDia Martes) (Encender LuzLiving)` |
-| `si 8 then abrir persiana` | `Si (EsHora 8) (Abrir Persiana)` |
+| `si tempCocina > 24 then encender AireAcon` | `Regla (CondSensor (Sensor "tempCocina" Digital 0) Mayor 24) (Encender aireAcon)` |
+| `si botonGarage activado then abrir PortonGarage` | `Regla (CondSensor (Sensor "botonGarage" Digital 5) Igual 1) (Abrir portonGarage)` |
 
 La sintaxis acepta condiciones sobre **sensores** (temperatura, presencia), **estado de dispositivos** (abierto, cerrado, activado), **día de la semana** y **hora del día**. Las acciones disponibles son: encender, apagar, abrir, cerrar — con soporte opcional para duración temporizada.
 
@@ -143,7 +151,7 @@ El sistema se organiza en tres capas:
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │                     Lenguaje del Usuario                        │
-│         si temperatura Cocina < 20 then cerrar Heladera         │
+│         si temperatura Cocina < 20 entonces cerrar Heladera         │
 └──────────────────────────┬──────────────────────────────────────┘
                            │  Parser
                            ▼

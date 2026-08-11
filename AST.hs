@@ -14,6 +14,7 @@ data DiaSemana = Lunes
                 | Domingo
   deriving (Show, Eq, Ord, Enum)
 
+-- Definir validaciones en el parser 
 data Hora = Hora {
   horas :: Int,
   minutos :: Int,
@@ -82,7 +83,7 @@ data Accion = Encender    Objeto
 data Estado = Estado { 
   --hrActual  :: Int, -- ver
   --diaActual :: DiaSemana, -- ver
-  estadoObjeto :: [(Objeto, EstadoObjeto)]
+  estadoObjeto :: [(Objeto, EstadoObjeto)],
   sensores :: [Sensor],
   pines :: [(Pin, Bool)], -- Pin usado(T) o no usado(F) 
   temporizadores :: [(Objeto, Hora)] -- pool de temporizadores
