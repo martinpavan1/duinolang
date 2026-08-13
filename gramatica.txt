@@ -1,0 +1,51 @@
+================= GRAMATICA DUINOLANG ==================
+
+-- GRAMATICA PROGRAMA --
+
+programa -> declaraciones reglas
+
+
+-- GRAMATICA DEFINE --
+
+declaraciones -> 'define' listaDecl 'end-define'
+listaDecl -> listaDecl decl | decl
+decl -> 'Sensor' nombre tipoSenial pin | 'Objeto' nombre tipoObjeto ubicacion nivel pin
+
+
+> declaraciones >
+> 'define' listaDecl 'end-define' >
+> 'define' listaDecl decl 'end-define' >
+> 'define' listaDecl decl decl 'end-define' >
+> 'define' decl decl decl 'end-define' >
+> 'define' 'Sensor' nombre tipoSenial pin 'Objeto' nombre tipoObjeto ubicacion nivel pin decl 'end-define'
+
+
+
+-- GRAMATICA REGLAS --
+
+reglas -> reglas regla | regla
+regla -> 'si' condicion 'entonces' accion ';'
+
+> reglas >
+> reglas regla >
+> reglas regla regla >
+> reglas regla regla regla >
+> regla regla regla regla >
+> 'si' condicion 'entonces' accion ';' 'si' condicion 'entonces' accion ';' 'si' condicion 'entonces' accion ';' 'si' condicion 'entonces' accion ';'
+
+
+-- GRAMATICA CONDICION --
+
+condicion -> condicion 'o' condicion' | condicion'
+condicion' -> condicion' 'y' condicion'' | condicion''
+condicion'' -> '(' condicion ')' | 'no' condicion | condFinal
+condFinal -> condSensor | condObjeto
+condSensor -> nombreSensor compopp valorSensor
+condObjeto -> nombreObjeto compopp valorObjeto
+compopp -> '<' | '>' | '==' | '<=' | '>=' | '!='
+
+
+
+
+
+-- GRAMATICA ACCION --

@@ -51,6 +51,7 @@ data TipoSenial = Digital | Analogica
 
 type Pin = Int
 type Nombre = String
+type Nivel = Int -- de 0 a 100
 
 
 data Sensor = Sensor {
@@ -65,6 +66,7 @@ data Comparador = Mayor | Menor | Igual
 
 --- Condiciones y acciones ejemplos
 data Condicion = CondSensor Sensor Comparador Int
+                | CondObjeto Objeto Comparador Nivel 
                 -- Condiciones compuestas (tipos recursivos) ?? reveer
                 | Y  Condicion Condicion
                 | O  Condicion Condicion
