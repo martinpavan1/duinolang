@@ -61,7 +61,7 @@ data Sensor = Sensor {
   } deriving (Show, Eq)
 
 
-data Comparador = Mayor | Menor | Igual
+data Comparador = Mayor | Menor | Igual | MayorIgual | MenorIgual | Distinto
   deriving (Show, Eq, Ord) -- Ver si lo sacamos??
 
 --- Condiciones y acciones ejemplos

@@ -20,7 +20,6 @@ decl -> 'Sensor' nombre tipoSenial pin | 'Objeto' nombre tipoObjeto ubicacion ni
 > 'define' 'Sensor' nombre tipoSenial pin 'Objeto' nombre tipoObjeto ubicacion nivel pin decl 'end-define'
 
 
-
 -- GRAMATICA REGLAS --
 
 reglas -> reglas regla | regla
@@ -38,14 +37,29 @@ regla -> 'si' condicion 'entonces' accion ';'
 
 condicion -> condicion 'o' condicion' | condicion'
 condicion' -> condicion' 'y' condicion'' | condicion''
-condicion'' -> '(' condicion ')' | 'no' condicion | condFinal
+condicion'' -> '(' condicion ')' | 'no' condicion'' | condFinal
 condFinal -> condSensor | condObjeto
 condSensor -> nombreSensor compopp valorSensor
 condObjeto -> nombreObjeto compopp valorObjeto
 compopp -> '<' | '>' | '==' | '<=' | '>=' | '!='
 
 
+-- Ejemplo: no (presenciaCocina == 100 y puertaCocina == 100) y tempCocina > 24 --
 
-
+> condicion >                                                  (condicion -> condicion')
+> condicion' >                                                 (condicion' -> condicion' 'y' condicion'')
+> condicion' 'y' condicion'' >                                 (condicion'' -> condFinal)
+> condicion' 'y' condFinal >                                   (condFinal -> condSensor)
+> condicion' 'y' condSensor >                                  (condicion' -> condicion'')
+> condicion'' 'y' condSensor >                                 (condicion'' -> 'no' condicion'')
+> 'no' condicion'' 'y' condSensor >                            (condicion'' -> '(' condicion ')')
+> 'no' '(' condicion ')' 'y' condSensor >                      (condicion -> condicion')
+> 'no' '(' condicion' ')' 'y' condSensor >                     (condicion' -> condicion' 'y' condicion'')
+> 'no' '(' condicion' 'y' condicion'' ')' 'y' condSensor >     (condicion' -> condicion'')
+> 'no' '(' condicion'' 'y' condicion'' ')' 'y' condSensor >    (condicion'' -> condFinal, aplicado a ambas)
+> 'no' '(' condFinal 'y' condFinal ')' 'y' condSensor >        (condFinal -> condSensor, condFinal -> condObjeto)
+> 'no' '(' condSensor 'y' condObjeto ')' 'y' condSensor >      (expandiendo cada condSensor y condObjeto)
+> 'no' '(' nombreSensor compopp valorSensor 'y' nombreObjeto compopp valorObjeto ')' 'y' nombreSensor compopp valorSensor >
+> 'no' '(' presenciaCocina '==' 100 'y' puertaCocina '==' 100 ')' 'y' tempCocina '>' 24
 
 -- GRAMATICA ACCION --
