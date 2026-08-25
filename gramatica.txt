@@ -63,3 +63,19 @@ compopp -> '<' | '>' | '==' | '<=' | '>=' | '!='
 > 'no' '(' presenciaCocina '==' 100 'y' puertaCocina '==' 100 ')' 'y' tempCocina '>' 24
 
 -- GRAMATICA ACCION --
+
+accion -> 'Encender' obj | 'Apagar' obj | 'Abrir' obj | 'Cerrar' obj | 'EncenderTemporizado' obj hr
+obj -> nombreObjeto
+hr -> digitos ':' digitos ':' digitos
+digitos -> digito digitos | digito
+digito -> '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9'
+
+encenderTemporizado LuzGarage 00:01:00
+
+accion >  (regla 1 de accion)
+'encendertemporizado' obj hr > (2)
+'encendertemporizado' LuzGarage hr > (3)
+'encendertemporizado' LuzGarage digitos ':' digitos ':' digitos > (4)
+'encendertemporizado' LuzGarage digito digitos ':' digito digitos ':' digito digitos > (4)
+'encendertemporizado' LuzGarage digito digito ':' digito digito ':' digito digito > (5)
+'encendertemporizado' LuzGarage '0' '0' ':' '0' '1' ':' '0' '0'

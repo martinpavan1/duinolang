@@ -125,7 +125,7 @@ end-define
 si tempCocina > 24 entonces encender AireAcon
 si presenciaLiving == inactivo entonces apagar LuzLiving
 si botonGarage activado entonces abrir PortonGarage
-si PortonGarage abierto entonces encender (LuzGarage 00:01:00)
+si PortonGarage abierto entonces encendertemporizado LuzGarage 00:01:00
 si martes entonces encender LuzLiving
 si hora >= 08:00:00 entonces abrir Persiana
 si hora >= 18:00:00 entonces cerrar Persiana
