@@ -85,13 +85,17 @@ data Accion = Encender    Objeto
 data Estado = Estado { 
   --hrActual  :: Int, -- ver
   --diaActual :: DiaSemana, -- ver
-  estadoObjeto :: [(Objeto, EstadoObjeto)],
+  objetos :: [Objeto],
   sensores :: [Sensor],
   pines :: [(Pin, Bool)], -- Pin usado(T) o no usado(F) 
   temporizadores :: [(Objeto, Hora)] -- pool de temporizadores
   }
     deriving Show
 
+data Regla = Regla { -- Cumpliendo la funcion de emparejar condiciones y acciones 
+  condicion :: Condicion,
+  accion :: Accion
+} deriving (Show, Eq)
 
 {-
 

@@ -1,10 +1,5 @@
 ================= GRAMATICA DUINOLANG ==================
 
--- GRAMATICA PROGRAMA --
-
-programa -> declaraciones reglas
-
-
 -- GRAMATICA DEFINE --
 
 declaraciones -> 'define' listaDecl 'end-define'
