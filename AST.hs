@@ -23,42 +23,36 @@ data Hora = Hora {
 } deriving (Show, Eq, Ord)
 
 data TipoObjeto = TipoEncendible 
+                | TipoLuz
                 | TipoAbrible 
                 | TipoActivable 
                 deriving (Show, Eq, Ord)
+type Pin = Int
+type Nombre = String
+type Nivel = Int -- de 0 a 100
 
 -- Objeto general, que deriva de los Tipos de objetos
 data Objeto = Objeto {
   nombreObjeto :: Nombre,
   tipo :: TipoObjeto,
   ubicacion :: Ubicacion,
-  estado :: EstadoObjeto, -- por defecto en 0
+  estadoObjeto :: Nivel, -- por defecto en 0
   pinOutput :: Pin  -- Defino Pin de output para accionar el objeto (Ver como lo definimos para manejarlo en el pool de pines)
 } deriving (Show, Eq, Ord)
 
---Estados para encendibles, abribles y activables
--- Preguntar si con el nivel solucionamos los estados intermedios y completos
-data EstadoObjeto = EstadoObjeto {
-        nivel :: Int -- de 0 a 100.. 
-                      -- 0 es apagado, 100 es encendido
-                      -- 1 a 99 estados intermedios 
-                      -- podemos definir estados intermedios fijos(ej: 25, 50, 75)
-} deriving (Show, Eq, Ord)
-
-
 data TipoSenial = Digital | Analogica
   deriving (Show, Eq)
-
-type Pin = Int
-type Nombre = String
-type Nivel = Int -- de 0 a 100
-
 
 data Sensor = Sensor {
     nombreSensor :: Nombre,
     senial :: TipoSenial,
     pinInput :: Pin
   } deriving (Show, Eq)
+
+-- Constructor data para definir variables
+data Variable = VO Objeto
+              | VS Sensor 
+  deriving (Show, Eq)
 
 
 data Comparador = Mayor | Menor | Igual | MayorIgual | MenorIgual | Distinto
@@ -92,22 +86,24 @@ data Estado = Estado {
   }
     deriving Show
 
-data Regla = Regla { -- Cumpliendo la funcion de emparejar condiciones y acciones 
+data Regla = Regla { -- Cumple la funcion de emparejar condiciones y acciones 
   condicion :: Condicion,
   accion :: Accion
 } deriving (Show, Eq)
 
-{-
 
-  if(sensorpresencia activo && luz apagada){
-    encendertemporizado luz 60
-    luzapagada = false
+-- Comandos 
+data Comm = Let Variable
+  deriving (Show, Eq)
 
-    } else if(sensorpresencia inactivo && luz encendida){
-    encendertemporizado luz 10
-    }
 
-    if(sensor activo)
-      encendertemporaizado 10
 
--}
+
+
+
+
+
+
+
+
+

@@ -4,7 +4,8 @@
 
 declaraciones -> 'define' listaDecl 'end-define'
 listaDecl -> listaDecl decl | decl
-decl -> 'Sensor' nombre tipoSenial pin | 'Objeto' nombre tipoObjeto ubicacion nivel pin
+decl -> 'Sensor' nombre tipoSenial pin 
+        | 'Objeto' nombre tipoObjeto ubicacion nivel pin 
 
 
 > declaraciones >
@@ -38,6 +39,12 @@ condSensor -> nombreSensor compopp valorSensor
 condObjeto -> nombreObjeto compopp valorObjeto
 compopp -> '<' | '>' | '==' | '<=' | '>=' | '!='
 
+// Agregamos valores de valores sensores 
+valorSensor -> digitos
+valorObjeto -> digitos
+digitos -> digito digitos | digito
+digito -> 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 
+
 
 -- Ejemplo: no (presenciaCocina == 100 y puertaCocina == 100) y tempCocina > 24 --
 
@@ -59,11 +66,11 @@ compopp -> '<' | '>' | '==' | '<=' | '>=' | '!='
 
 -- GRAMATICA ACCION --
 
-accion -> 'Encender' obj | 'Apagar' obj | 'Abrir' obj | 'Cerrar' obj | 'EncenderTemporizado' obj hr
-obj -> nombreObjeto
-hr -> digitos ':' digitos ':' digitos
-digitos -> digito digitos | digito
-digito -> '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9'
+1) accion -> 'Encender' obj | 'Apagar' obj | 'Abrir' obj | 'Cerrar' obj | 'EncenderTemporizado' obj hr
+2) obj -> nombreObjeto
+3) hr -> digitos ':' digitos ':' digitos
+4) digitos -> digito digitos | digito
+5) digito -> '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9'
 
 encenderTemporizado LuzGarage 00:01:00
 
@@ -74,3 +81,39 @@ accion >  (regla 1 de accion)
 'encendertemporizado' LuzGarage digito digitos ':' digito digitos ':' digito digitos > (4)
 'encendertemporizado' LuzGarage digito digito ':' digito digito ':' digito digito > (5)
 'encendertemporizado' LuzGarage '0' '0' ':' '0' '1' ':' '0' '0'
+
+
+
+// Crear comandos de iteracion (similar for-while)
+
+// Modos de ambientacion implementando corutinas(lluvia,cena,dia,noche,cita)
+
+// Corutinas
+cita={
+  luzLiving=0.5
+  luzHabitacion=0.2
+  luzComedor=0.2
+}
+
+
+pinIN1 -> configuramos boton funcion (presionar > 2 seg para configurar ambientacion)
+
+pinIN1 -> pasa al modo ambientacion:
+el led pasa a parpadear de modo intermitente.
+for, if, .....
+
+el usuario tiene que colocar todo como quiere que este en ese "modo".
+Ej Configura modo lluvia:
+  1. cerrar ventanas
+  2. cerrar toldo
+  3. cerrar puertas
+  4. cerrar porton
+
+presiona nuevamente el boton para confirmar el estado:
+genera un snapshot de todos los sensores y objetos en ese momento
+y lo almacena en una lista.
+
+modos=[ventanaComedor=cerrada, ventanaHabitacion=cerrada.....]
+
+
+
