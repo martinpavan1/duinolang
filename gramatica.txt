@@ -7,7 +7,6 @@ listaDecl -> listaDecl decl | decl
 decl -> 'Sensor' nombre tipoSenial pin 
         | 'Objeto' nombre tipoObjeto ubicacion nivel pin 
 
-
 > declaraciones >
 > 'define' listaDecl 'end-define' >
 > 'define' listaDecl decl 'end-define' >
@@ -18,23 +17,40 @@ decl -> 'Sensor' nombre tipoSenial pin
 
 -- GRAMATICA REGLAS --
 
-reglas -> reglas regla | regla
-regla -> 'si' condicion 'entonces' accion ';'
+# reglas -> reglas regla | regla
+# regla -> 'si' condicion 'entonces' accion ';'
 
-> reglas >
+> reglas >                            GRAMATICA REGLAS VIEJA
 > reglas regla >
 > reglas regla regla >
 > reglas regla regla regla >
 > regla regla regla regla >
 > 'si' condicion 'entonces' accion ';' 'si' condicion 'entonces' accion ';' 'si' condicion 'entonces' accion ';' 'si' condicion 'entonces' accion ';'
 
+comandos -> comandos comm | comm
+comm -> asignacion | si | mientras | para | paraCada | ...
+asignacion -> 
 
 -- GRAMATICA CONDICION --
-
 condicion -> condicion 'o' condicion' | condicion'
 condicion' -> condicion' 'y' condicion'' | condicion''
 condicion'' -> '(' condicion ')' | 'no' condicion'' | condFinal
-condFinal -> condSensor | condObjeto
+
+condFinal -> nombreVariable compopp valor
+nombreVariable -> identificador
+
+# No definimos operador de acceso a los objetos porque no vale la pena, cuando se llama al indentificador, se obtiene el dato relevante
+# Ej: luzCocina
+# se busca en el estado la variable con nombre luzCocina.
+# Si es un Objeto, se convierte en: CondObjeto objeto "operador" 50
+# Si es un Sensor, se convierte en: CondSensor sensor "operador" 50
+
+valor -> digitos
+digitos -> digitos digito | digito
+digito -> 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9
+
+PARA LA GRAMATICA DE CONDICION CREAMOS OPERADORES DE ACCESO ??? 
+
 condSensor -> nombreSensor compopp valorSensor
 condObjeto -> nombreObjeto compopp valorObjeto
 compopp -> '<' | '>' | '==' | '<=' | '>=' | '!='

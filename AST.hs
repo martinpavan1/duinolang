@@ -30,6 +30,7 @@ data TipoObjeto = TipoEncendible
 type Pin = Int
 type Nombre = String
 type Nivel = Int -- de 0 a 100
+type ListaPines = [Pin]
 
 -- Objeto general, que deriva de los Tipos de objetos
 data Objeto = Objeto {
@@ -52,6 +53,9 @@ data Sensor = Sensor {
 -- Constructor data para definir variables
 data Variable = VO Objeto
               | VS Sensor 
+              | VI Int
+              | VN Nombre
+              | VLP ListaPines
   deriving (Show, Eq)
 
 
@@ -93,8 +97,10 @@ data Regla = Regla { -- Cumple la funcion de emparejar condiciones y acciones
 
 
 -- Comandos 
-data Comm = Let Variable
+data Comm = Let Nombre Variable
+          | 
   deriving (Show, Eq)
+
 
 
 
