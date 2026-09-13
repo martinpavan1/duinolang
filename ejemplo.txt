@@ -61,18 +61,6 @@ void loop() {
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 si presencia Living == falso then apagar LuzLiving
 si botonGarage activado then abrir portonGarage
 si portonGarage abierto then encender luzGarage 60s

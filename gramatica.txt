@@ -1,86 +1,34 @@
 ================= GRAMATICA DUINOLANG ==================
+=== GRAMATICA PROGRAMA ===
+programa -> declaraciones comandos 
 
 === GRAMATICA DEFINE ===
+declaraciones -> 'define' poolPines listaDecl 'end-define'
 
-declaraciones -> 'define' listaDecl 'end-define'
-listaDecl -> listaDecl decl | decl
-decl -> 'Sensor' nombre tipoSenial pin 
-        | 'Objeto' nombre tipoObjeto ubicacion nivel pin 
+poolPines -> 'Pines' nombre pines ';'
+pines -> '[' listaEnteros ']'
+listaEnteros -> entero | entero ',' listaEnteros
 
-=== GRAMATICA COMANDOS ===
-comandos -> comm | comm comandos
-comm -> let | si | mientras | ejecutar | secuencia 
+listaDecl -> decl listaDecl | decl
+decl -> sensor | objeto
 
-=== GRAMATICA LET ===
-let -> nombre '=' var ';'
+sensor -> 'Sensor' nombre tipoSenial pin activo ';'
+tipoSenial -> 'Digital' | 'Analogica'
+activo -> 'True' | 'False'
 
-=== GRAMATICA SI ===
-si -> 'si' condicion 'entonces' '(' comandos ')'
-condicion -> condicion 'o' condicion' | condicion'
-condicion' -> condicion' 'y' condicion'' | condicion''
-condicion'' -> '(' condicion ')' | 'no' condicion'' | condFinal
+objeto -> 'Objeto' nombre tipoObjeto ubicacion nivel pin ';'
+tipoObjeto -> 'TipoEncendible' | 'TipoAbrible' | 'TipoActivable'
+ubicacion -> nombre
+nivel -> entero
 
-condFinal -> 'CondSensor' sensor compopp entero
-           | 'CondObjeto' objeto compopp entero
-
-=== GRAMATICA MIENTRAS ===
-mientras -> 'mientras' condicion 'hacer' '(' comandos ')'
-
-=== GRAMATICA EJECUTAR ===
-ejecutar -> accion
-accion -> 'Encender' objeto
-          | 'Apagar' objeto
-          | 'Abrir' objeto
-          | 'Cerrar' objeto
-          | 'EncenderTemporizado' objeto hora
-
-=== GRAMATICA SECUENCIA ===
-secuencia -> 'secuencia' '(' comandos ')'
-
-
-
-
-
-//condFinal -> nombreVariable compopp entero
-//nombreVariable -> nombre
-
-# No definimos operador de acceso a los objetos porque no vale la pena, cuando se llama al indentificador, se obtiene el dato relevante
-# Ej: luzCocina
-# se busca en el estado la variable con nombre luzCocina.
-# Si es un Objeto, se convierte en: CondObjeto objeto 'operador' 50
-# Si es un Sensor, se convierte en: CondSensor sensor 'operador' 50
-
-entero -> digitos
-digitos -> digitos digito | digito
-digito -> 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9
-
-PARA LA GRAMATICA DE CONDICION CREAMOS OPERADORES DE ACCESO ??? 
-
-//condSensor -> nombreSensor compopp valorSensor
-//condObjeto -> nombreObjeto compopp valorObjeto
-compopp -> '<' | '>' | '==' | '<=' | '>=' | '!='
-
-// Agregamos valores de valores sensores 
-valorSensor -> entero
-valorObjeto -> entero
-
-=== GRAMATICA ACCION ===
-accion -> 'Encender' objeto | 'Apagar' objeto | 'Abrir' objeto | 'Cerrar' objeto | 'EncenderTemporizado' objeto hr
-hr -> entero ':' entero ':' entero
+pin -> entero
 
 === GRAMATICA VARIABLE ===
-var -> objeto | sensor | entero | nombre | listaVar
+//Como definimos que los objetos y sensores sean declarados en el bloque
+// define, la gramatica de variable no permite crear nuevas variables de objetos/sensores
+var -> entero | nombre | listaVar
 
 === TERMINALES DE VARIABLE ===
-objeto -> 'Objeto' ubicacion estadoActual pin
-ubicacion -> nombre
-estadoActual -> entero
-pin -> entero
-
-sensor -> 'Sensor' tipoSenial pin activo
-tipoSenial -> 'Digital' | 'Analogica'
-pin -> entero
-activo -> True | False
 
 nombre -> letras                     
 letras -> letra letras | letra
@@ -90,9 +38,57 @@ letra -> a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z
 listaVar -> '[' ']' | '[' elementos ']'
 elementos -> var ',' elementos | var
 
+entero -> digitos
+digitos -> digitos digito | digito
+digito -> 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9
 
+=== GRAMATICA COMANDOS ===
+comandos -> comm | comm comandos
+comm -> let | si | mientras | ejecutar | secuencia | map
 
+=== GRAMATICA LET ===
+let -> nombre '=' var ';'
 
+=== GRAMATICA SI ===
+si -> 'si' condicion 'entonces' '(' comandos ')'
+condicion -> condicion 'o' condicion' | condicion'
+condicion' -> condicion' 'y' condicion'' | condicion''
+condicion'' -> '(' condicion ')' | 'no' condicion'' | condFinal
+condFinal -> nombre compopp entero
+
+compopp -> '<' | '>' | '==' | '<=' | '>=' | '!='
+
+//De esta manera el usuario deberia escribir todo el objeto entero para evaluarlo (muy tedioso/dificil)
+//condFinal -> 'CondSensor' sensor compopp entero
+           | 'CondObjeto' objeto compopp entero
+
+# No definimos operador de acceso a los objetos porque no vale la pena, cuando se llama al indentificador, se obtiene el dato relevante
+# Ej: luzCocina
+# se busca en el estado la variable con nombre luzCocina.
+# Si es un Objeto, se convierte en: CondObjeto objeto 'operador' 50
+# Si es un Sensor, se convierte en: CondSensor sensor 'operador' 50
+
+=== GRAMATICA MIENTRAS ===
+mientras -> 'mientras' condicion 'hacer' '(' comandos ')'
+
+=== GRAMATICA EJECUTAR ===
+//nombre representa el nombre del objeto en el estado.
+ejecutar -> accion
+
+=== GRAMATICA ACCION ===
+accion -> 'Encender' nombre
+          | 'Apagar' nombre
+          | 'Abrir' nombre
+          | 'Cerrar' nombre
+          | 'EncenderTemporizado' nombre hora
+
+hora -> entero ':' entero ':' entero
+
+=== GRAMATICA SECUENCIA ===
+secuencia -> 'secuencia' '(' comandos ')'
+
+=== GRAMATICA MAP ===
+map -> 'Map' accion listaVar
 
 
 

@@ -1,10 +1,3 @@
--- data Ubicacion = Cocina 
---                 | Living 
---                 | Garage 
---                 | Pieza 
---                 | Exterior
---   deriving (Show, Eq, Ord, Enum)
-
 data DiaSemana = Lunes 
                 | Martes 
                 | Miercoles 
@@ -33,7 +26,6 @@ type ListaPines = [Pin]
 
 -- Objeto general, que deriva de los Tipos de objetos
 data Objeto = Objeto {
-  nombreObjeto :: Nombre,
   tipo :: TipoObjeto,
   ubicacion :: Nombre,
   estadoObjeto :: Nivel, -- por defecto en 0
@@ -44,7 +36,6 @@ data TipoSenial = Digital | Analogica
   deriving (Show, Eq)
 
 data Sensor = Sensor {
-    nombreSensor :: Nombre,
     senial :: TipoSenial,
     pinInput :: Pin,
     activo :: Bool
@@ -58,14 +49,12 @@ data Var = VObj Objeto
           | VList [Var]
   deriving (Show, Eq)
 
-
 data Comparador = Mayor | Menor | Igual | MayorIgual | MenorIgual | Distinto
   deriving (Show, Eq, Ord) -- Ver si lo sacamos??
 
 --- Condiciones y acciones ejemplos
 data Condicion = CondSensor Sensor Comparador Int
                 | CondObjeto Objeto Comparador Nivel 
-                -- Condiciones compuestas (tipos recursivos) ?? reveer
                 | Y  Condicion Condicion
                 | O  Condicion Condicion
                 | No Condicion
@@ -81,15 +70,14 @@ data Accion = Encender    Objeto
 
 -- Estado guarda todos las configuraciones de los pines, sensores y objetos, y sus estados actuales definidos por el usuario en define
 data Estado = Estado { 
-  --hrActual  :: Int, -- ver
-  --diaActual :: DiaSemana, -- ver
-  objetos :: [Objeto],
-  sensores :: [Sensor],
+  constantes :: [Nombre], --Son las que definimos en define
+  variables :: [(Nombre, Var)],
+  objetos :: [(Nombre, Objeto)], --Par clave-valor
+  sensores :: [(Nombre, Sensor)], 
   pines :: [(Pin, Bool)], -- Pin usado(T) o no usado(F) 
   temporizadores :: [(Objeto, Hora)] -- pool de temporizadores
-  }
+}
     deriving Show
-
 
 -- Comandos 
 data Comm = Let Nombre Var
