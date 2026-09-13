@@ -1,9 +1,9 @@
-data Ubicacion = Cocina 
-                | Living 
-                | Garage 
-                | Pieza 
-                | Exterior
-  deriving (Show, Eq, Ord, Enum)
+-- data Ubicacion = Cocina 
+--                 | Living 
+--                 | Garage 
+--                 | Pieza 
+--                 | Exterior
+--   deriving (Show, Eq, Ord, Enum)
 
 data DiaSemana = Lunes 
                 | Martes 
@@ -23,7 +23,6 @@ data Hora = Hora {
 } deriving (Show, Eq, Ord)
 
 data TipoObjeto = TipoEncendible 
-                | TipoLuz
                 | TipoAbrible 
                 | TipoActivable 
                 deriving (Show, Eq, Ord)
@@ -36,7 +35,7 @@ type ListaPines = [Pin]
 data Objeto = Objeto {
   nombreObjeto :: Nombre,
   tipo :: TipoObjeto,
-  ubicacion :: Ubicacion,
+  ubicacion :: Nombre,
   estadoObjeto :: Nivel, -- por defecto en 0
   pinOutput :: Pin  -- Defino Pin de output para accionar el objeto (Ver como lo definimos para manejarlo en el pool de pines)
 } deriving (Show, Eq, Ord)
@@ -47,15 +46,16 @@ data TipoSenial = Digital | Analogica
 data Sensor = Sensor {
     nombreSensor :: Nombre,
     senial :: TipoSenial,
-    pinInput :: Pin
+    pinInput :: Pin,
+    activo :: Bool
   } deriving (Show, Eq)
 
 -- Constructor data para definir variables
-data Variable = VO Objeto
-              | VS Sensor 
-              | VI Int
-              | VN Nombre
-              | VLP ListaPines
+data Var = VObj Objeto
+          | VSens Sensor 
+          | VInt Int
+          | VNomb Nombre
+          | VList [Var]
   deriving (Show, Eq)
 
 
@@ -90,26 +90,12 @@ data Estado = Estado {
   }
     deriving Show
 
-data Regla = Regla { -- Cumple la funcion de emparejar condiciones y acciones 
-  condicion :: Condicion,
-  accion :: Accion
-} deriving (Show, Eq)
-
 
 -- Comandos 
-data Comm = Let Nombre Variable
-          | 
+data Comm = Let Nombre Var
+          | Si Condicion [Comm]
+          | Mientras Condicion [Comm]
+          | Ejecutar Accion
+          | Map Accion [Var] --Preguntar
+          | Secuencia Comm Comm
   deriving (Show, Eq)
-
-
-
-
-
-
-
-
-
-
-
-
-
