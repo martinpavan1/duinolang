@@ -1,3 +1,5 @@
+module AST where
+
 data DiaSemana = Lunes 
                 | Martes 
                 | Miercoles 

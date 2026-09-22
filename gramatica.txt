@@ -47,7 +47,7 @@ comandos -> comm | comm comandos
 comm -> let | si | mientras | ejecutar | secuencia | map
 
 === GRAMATICA LET ===
-let -> nombre '=' var ';'
+let -> nombre ':=' var ';'
 
 === GRAMATICA SI ===
 si -> 'si' condicion 'entonces' '(' comandos ')'

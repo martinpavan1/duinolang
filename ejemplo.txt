@@ -67,3 +67,10 @@ si portonGarage abierto then encender luzGarage 60s
 si martes then encender LuzLiving
 si 8 then abrir persiana
 si 18 then cerrar persiana
+
+
+
+Pines nombre [1,2,3,4,5]
+
+
+sepBy comma y aplica la funcion integer
