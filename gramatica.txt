@@ -50,7 +50,7 @@ comm -> let | si | mientras | ejecutar | secuencia | map
 let -> nombre ':=' var ';'
 
 === GRAMATICA SI ===
-si -> 'si' condicion 'entonces' '(' comandos ')'
+si -> 'si' condicion 'entonces' '(' comandos ')' ';'
 condicion -> condicion 'o' condicion' | condicion'
 condicion' -> condicion' 'y' condicion'' | condicion''
 condicion'' -> '(' condicion ')' | 'no' condicion'' | condFinal
@@ -68,8 +68,8 @@ compopp -> '<' | '>' | '==' | '<=' | '>=' | '!='
 # Si es un Objeto, se convierte en: CondObjeto objeto 'operador' 50
 # Si es un Sensor, se convierte en: CondSensor sensor 'operador' 50
 
-=== GRAMATICA MIENTRAS ===
-mientras -> 'mientras' condicion 'hacer' '(' comandos ')'
+=== GRAMATICA MIENTRAS === 
+mientras -> 'mientras' condicion 'hacer' '(' comandos ')' ';'
 
 === GRAMATICA EJECUTAR ===
 //nombre representa el nombre del objeto en el estado.

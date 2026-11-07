@@ -47,6 +47,8 @@ lis = makeTokenParser (emptyDef { commentLine     = "//"
                     , "o"
                     , "y"
                     , "no"
+                    , "const" --Para constantes del programa
+                    , "timer" -- para los temporizadores a utilizar
                     ]
                 , reservedOpNames = 
                     [  "+"
@@ -67,6 +69,8 @@ lis = makeTokenParser (emptyDef { commentLine     = "//"
                     , "," -- separador de campos
                     ]
                 })
+
+
 
 -- programa -> declaraciones comandos
 parsePrograma :: Parser ([Comm], Estado)
@@ -105,6 +109,9 @@ parseDeclaraciones = do
 
 data Declaracion   = DeclObjeto (Nombre, Objeto) | DeclSensor (Nombre, Sensor) deriving Show
 
+
+{- Agregar bloque de codigo para parsear los timers y const -}
+
 -- poolPines -> 'Pines' nombre pines ';'
 parsePoolPines :: Parser ([Pin])
 parsePoolPines = do
@@ -135,7 +142,7 @@ parseSensor = do
                 nombre <- identifier lis
                 tipo <- parseTipoSenial
                 pin <- integer lis
-                activoSensor <- parseActivo
+                activoSensor <- parseActivo -- ???
 
                 reservedOp lis ";"
 
@@ -199,7 +206,7 @@ parseVar = do
                 entero <- integer lis
                 return (VInt (fromInteger n))
             <|> do
-                listaVar <- brackets lis parseListaVar
+                listaVar <- parseListaVar
                 return (VList xs)
             <|> do
                 varNombre <- identifier lis
@@ -225,6 +232,7 @@ parseComm = try parseLet
 -- let -> nombre ':=' var ';'
 parseLet :: Parser Comm
 parseLet = do
+            reserved lis "let"
             nombre <- identifier lis
             reservedOp lis ":="
             valor <- parseVar
@@ -232,7 +240,7 @@ parseLet = do
 
             return (Let nombre valor)
 
--- si -> 'si' condicion 'entonces' '(' comandos ')'
+-- si -> 'si' condicion 'entonces' '(' comandos ')' ';'
 parseSi :: Parser Comm
 parseSi = do
             reserved lis "si"
@@ -240,10 +248,11 @@ parseSi = do
             reserved lis "entonces"
 
             comandos <- parens lis parseComandos
+            reservedOp lis ";"
 
             return (Si condicion comandos)
 
--- mientras -> 'mientras' condicion 'hacer' '(' comandos ')'
+-- mientras -> 'mientras' condicion 'hacer' '(' comandos ')' ';'
 parseMientras :: Parser Comm
 parseMientras = do
                     reserved lis "mientras"
@@ -251,6 +260,7 @@ parseMientras = do
                     reserved lis "hacer"
 
                     comandos <- parens lis parseComandos
+                    reservedOp lis ";"
 
                     return (Mientras condicion comandos)
 
@@ -299,6 +309,10 @@ parseCondFinal = do
                     -- No tenemos el estado para acceder al nombre del identificador y 
                     -- posteriormente al valor.
                     -- Resuelvo nombre -> Objeto/Sensor en resolverCondicion
+                    -- ######### TODO ###########
+                    -- acceder al estado y buscar el nombre que identifica al objeto, despues el valor del mismo
+                    -- para poder hacer la comparacion con el valor de referencia.
+
                     return (CondObjeto
                         (Objeto
                             { tipo = TipoActivable
@@ -397,16 +411,18 @@ parseHora = do
                 symbol ":"
                 s <- integer lis
 
-                if h >= 0 && m >= 0 && m < 60 && s >= 0 && s < 60
+                if h >= 0 && h < 24 && m >= 0 && m < 60 && s >= 0 && s < 60
                     then return (Hora h m s)
                     else error "hora invalida"
 
--- secuencia -> 'secuencia' '(' comandos ')'
+-- secuencia -> 'secuencia' '(' comandos ')' ';'
 parseSecuencia :: Parser Comm
 parseSecuencia = do
                     reserved lis "secuencia"
 
                     comandos <- parens parseComandos
+                    reservedOp lis ";"
+
 
                     return (listaASeceuncia comandos)
 
@@ -415,13 +431,14 @@ listaASeceuncia [] = error "secuencia vacia"
 listaASeceuncia [x] = x
 listaASeceuncia (x:xs) = Secuencia x (listaASeceuncia xs)
 
--- map -> 'Map' accion listaVar
+-- map -> 'Map' accion listaVar ';'
 parseMap :: Parser Comm
 parseMap = do
                 reserved lis "Map"
 
                 accion <- parseAccion
                 vars <- parseListaVar
+                reservedOp lis ";"
 
                 return (Map accion vars)
 
@@ -429,7 +446,7 @@ parseMap = do
 -- OBJETO PLACEHOLDER
 -- ============================================================
 -- Durante el parseo sabemos el nombre del Objeto pero no sus propiedades
--- Uso un placeholder y despues resolverObjeto reemplaza este placeholder
+-- Uso un placeholder y despues buscarObjeto reemplaza este placeholder
 -- por el objeto declarado en define.
 
 objetoPlaceholder :: Nombre -> Objeto
@@ -439,17 +456,15 @@ objetoPlaceholder nombre = Objeto { tipo = TipoActivable
                                     , pinOutput = -1
                                     }
 
-resolverObjeto :: Estado -> Nombre -> Either String Objeto
-resolverObjeto estado nombre = case lookup nombre (objetos estado) of
+buscarObjeto :: Estado -> Nombre -> Either String Objeto
+buscarObjeto estado nombre = case lookup nombre (objetos estado) of
                                     Just obj -> Right obj
-                                    Nothing ->
-                                        Left ("Objeto no definido: " ++ nombre)
+                                    Nothing -> Left ("Objeto no definido: " ++ nombre)
 
-resolverSensor :: Estado -> Nombre -> Either String Sensor
-resolverSensor estado nombre = case lookup nombre (sensores estado) of
+buscarSensor :: Estado -> Nombre -> Either String Sensor
+buscarSensor estado nombre = case lookup nombre (sensores estado) of
                                     Just sensor -> Right sensor
-                                    Nothing ->
-                                        Left ("Sensor no definido: " ++ nombre)
+                                    Nothing -> Left ("Sensor no definido: " ++ nombre)
 
 -- ============================================================
 -- ACCIONES
@@ -459,23 +474,23 @@ resolverAccion estado accion =
     case accion of
 
         Encender obj -> do
-                            obj' <- resolverObjeto estado (ubicacion obj)
+                            obj' <- buscarObjeto estado (ubicacion obj)
                             return (Encender obj')
 
         Apagar obj -> do
-                        obj' <- resolverObjeto estado (ubicacion obj)
+                        obj' <- buscarObjeto estado (ubicacion obj)
                         return (Apagar obj')
 
         Abrir obj -> do
-                        obj' <- resolverObjeto estado (ubicacion obj)
+                        obj' <- buscarObjeto estado (ubicacion obj)
                         return (Abrir obj')
 
         Cerrar obj -> do
-                        obj' <- resolverObjeto estado (ubicacion obj)
+                        obj' <- buscarObjeto estado (ubicacion obj)
                         return (Cerrar obj')
 
         EncenderTemporizado obj hora -> do
-                                            obj' <- resolverObjeto estado (ubicacion obj)
+                                            obj' <- buscarObjeto estado (ubicacion obj)
                                             return (EncenderTemporizado obj' hora)
 
 
@@ -488,15 +503,19 @@ resolverCondicion estado condicion =
     case condicion of
 
         CondObjeto obj comp valor -> do
-                                        obj' <- resolverObjeto estado (ubicacion obj)
+                                        obj' <- buscarObjeto estado (ubicacion obj)
                                         return (CondObjeto obj' comp valor)
 
-        CondSensor sensor comp valor -> return -- reemplazar con logica para resolver la condSensor
+        CondSensor sensor comp valor -> do 
+                                          sens' <- buscarSensor estado (nombre sensor)
+                                          return (CondSensor sens' comp valor)
+            
+            --return -- reemplazar con logica para resolver la condSensor
 
         Y c1 c2 -> do
-                    c1' <- resolverCondicion estado c1
-                    c2' <- resolverCondicion estado c2
-                    return (Y c1' c2')
+                    c1' <- resolverCondicion estado c1 --CondSensor tempCocina > 24
+                    c2' <- resolverCondicion estado c2 --CondObjeto aireCocina == 0
+                    return (Y c1' c2') -- Y CondSensor tempCocina > 24 CondObjeto aireCocina == 0
 
         O c1 c2 -> do
                     c1' <- resolverCondicion estado c1
@@ -506,4 +525,4 @@ resolverCondicion estado condicion =
         No c -> do
                     c' <- resolverCondicion estado c
                     return (No c')
-
+        

@@ -1,26 +1,36 @@
 define
-PoolPines = [1,2,3,4,5,6,7,8,9,10,11]
+PoolPines = [1,2,3,4,5,6,7,8,9,10,11];
 
-sensor tempCocina = Analogica 2 
-sensor presenciaGarage = Digital 1
-sensor humedadBanio = Digital 3
+sensor tempCocina = Analogica 2 True;
+sensor presenciaGarage = Digital 1 True;
+sensor humedadBanio = Digital 3 True;
 
-objeto aireCocina = Encendible Cocina 0 6
-objeto luzGarage = Encendible Garage 0 7
-objeto extractorBanio = Encendible Banio 0 8
+objeto aireCocina = Encendible Cocina 0 6;
+objeto luzGarage = Encendible Garage 0 7;
+objeto extractorBanio = Encendible Banio 0 8;
+objeto botonGarage = Activable Garage 0 9;
+
+timer timerApertura = 5;
+timer timerCierre = 2;
+
+const tempCocinaReferencia = 24;
 
 end-define
 
+si tempCocina > 24 then (encender aireCocina);
 
+si botonGarage then (encender luzGarage)
 
-
+si tempCocina > 24 Y aireCocina == 0 then (encender aireCocina)
 
 entramos en modo configuracion
 -> las salidas activas al momento de entrar al modo, siguen activas.
 -> no se realizan lecturas de los sensores, ni actuadores.
 -> solamente se permite configurar
 
+Si las personas no estan en la casa, pero la temperatura de la cocina es > 24, hace algo?
 
+Prenderia el aire, Con un boton, activamos o desactivamos los sensores para que no se prendan las cosas solas..
 
 
 
